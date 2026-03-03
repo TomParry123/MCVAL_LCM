@@ -1,0 +1,33 @@
+model {
+
+	### PRIORS ###
+
+	for (l in 1:L) {
+		log_mu_t[l] ~ dnorm(0, 0.5)
+		mu_t[l] <- ilogit(log_mu_t[l])
+		sigma_t[l] ~ dnorm(0, 1) T(0, )
+		tau_t[l] <- 1 / pow(sigma_t[l], 2)
+
+		for (r in 1:R) {
+			log_p[l, r] ~ dnorm(log_mu_t[l], tau_t[l])
+			p[l, r] <- ilogit(log_p[l, r])
+		}
+	}
+	
+	l[1:L] ~ ddirch(rep(1, L))
+
+	### LIKELIHOOD ###
+
+	for (i in 1:I) {
+
+		b[i] ~ dcat(l[1:L])
+
+		for (r in 1:R) {
+			y[i, r] ~ dbern(p[b[i], r])
+		}
+	}
+}
+
+
+
+
