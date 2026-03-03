@@ -1,0 +1,44 @@
+library(readr)
+library(rjags)
+library(coda)
+library(data.table)
+
+################################################################################
+
+for (i in 1:4) {
+  for (k in 1:100) {
+    
+    y <- read.csv(paste0("file_path/y", i, "_", k, ".csv"))
+
+################################################################################
+
+    data_list <- list(y = y,
+                      I = nrow(y),
+                      R = ncol(y),
+                      L = 2)
+
+
+    inits1 <- list(".RNG.name" = "base::Wichmann-Hill", ".RNG.seed" = 1)
+    inits2 <- list(".RNG.name" = "base::Wichmann-Hill", ".RNG.seed" = 2)
+    inits3 <- list(".RNG.name" = "base::Wichmann-Hill", ".RNG.seed" = 3)
+    inits_list <- list(inits1, inits2, inits3)
+
+################################################################################
+
+    jags <- jags.model(paste0("file_path/ML1.txt"), data = data_list, n.chain = 3, n.adapt = 2000, inits = inits_list)
+    
+    burn_in_steps <- 5000
+    update(jags, n.iter = burn_in_steps)
+    
+    params <- c("b", "l", "p", "mu_t", "tau_t")
+    
+    codas <- coda.samples(jags, params, n.iter = 15000)
+    coda <- as.data.frame(as.matrix(codas))
+    
+    write_csv(coda, file = paste0("file_path/coda", i, "_", k, ".csv"))
+  }
+}
+
+################################################################################
+
+
