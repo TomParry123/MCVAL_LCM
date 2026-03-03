@@ -1,0 +1,102 @@
+*** 1 R3 SETUP ***
+
+********************************************************************************
+
+	forval i = 1/100 {
+		
+		use "$path_import\data", clear
+
+		keep id epc rater*
+		
+		set seed `i'
+		
+		bsample
+		gen num = _n
+		
+		save "$path_temp\SS4_`i'", replace
+		
+		gen rnum = runiform()
+		sort rnum
+		drop if _n<=25
+		drop rnum
+		
+		save "$path_temp\SS3_`i'", replace
+		
+		gen rnum = runiform()
+		sort rnum
+		drop if _n<=25
+		drop rnum
+		
+		save "$path_temp\SS2_`i'", replace
+		
+		gen rnum = runiform()
+		sort rnum
+		drop if _n<=25
+		drop rnum
+		
+		save "$path_temp\SS1_`i'", replace
+	}
+
+********************************************************************************
+
+	local j = 1
+	foreach i in 25 50 75 100 {
+		qui forval k = 1/100 {
+			
+			use "$path_temp\SS`j'_`k'", clear
+			
+			set seed `k'
+			
+			local n1 = ceil(runiform()*26)
+			local n2 = ceil(runiform()*26)
+			local n3 = ceil(runiform()*26)
+			local n4 = ceil(runiform()*26)
+			local n5 = ceil(runiform()*26)
+			local n6 = ceil(runiform()*26)
+			local n7 = ceil(runiform()*26)
+			local n8 = ceil(runiform()*26)
+			local n9 = ceil(runiform()*26)
+			local n10 = ceil(runiform()*26)
+			while (`n1'==`n2' | `n1'==`n3' | `n1'==`n4' | `n1'==`n5' | `n1'==`n6' | `n1'==`n7' | `n1'==`n8' | `n1'==`n9' | `n1'==`n10' | `n2'==`n3' | `n2'==`n4' | `n2'==`n5' | `n2'==`n6' | `n2'==`n7' | `n2'==`n8' | `n2'==`n9' | `n2'==`n10' | `n3'==`n4' | `n3'==`n5' | `n3'==`n6' | `n3'==`n7' | `n3'==`n8' | `n3'==`n9' | `n3'==`n10' | `n4'==`n5' | `n4'==`n6' | `n4'==`n7' | `n4'==`n8' | `n4'==`n9' | `n4'==`n10' | `n5'==`n6' | `n5'==`n7' | `n5'==`n8' | `n5'==`n9' | `n5'==`n10' | `n6'==`n7' | `n6'==`n8' | `n6'==`n9' | `n6'==`n10' | `n7'==`n8' | `n7'==`n9' | `n7'==`n10' | `n8'==`n9' | `n8'==`n10' | `n9'==`n10') {
+				local n1 = ceil(runiform()*26)
+				local n2 = ceil(runiform()*26)
+				local n3 = ceil(runiform()*26)
+				local n4 = ceil(runiform()*26)
+				local n5 = ceil(runiform()*26)
+				local n6 = ceil(runiform()*26)
+				local n7 = ceil(runiform()*26)
+				local n8 = ceil(runiform()*26)
+				local n9 = ceil(runiform()*26)
+				local n10 = ceil(runiform()*26)
+			}
+			
+			keep id num epc rater`n1' rater`n2' rater`n3'
+			gen num1 = _n
+			
+			gen ss = `i'
+			gen bts = `k'
+
+			save "$path_temp\patt`j'_`k'", replace
+			
+			forval q = 1/3 {
+				rename rater`n`q'' r`q'
+			}
+			keep r1 r2 r3
+			order r1 r2 r3
+	
+			export delimited "$path_export\y`j'_`k'", replace
+		}
+
+		local ++j
+	}
+
+********************************************************************************
+
+
+
+
+
+
+
+
+
